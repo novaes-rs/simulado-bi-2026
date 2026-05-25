@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado de Business Intelligence — Tomada de Decisão Gerencial</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --azul-primario:  #0d233a;
+    --azul-medio:     #1c4263;
+    --azul-claro:     #eef4f8;
+    --azul-hover:     #e1ecf4;
+    --azul-borda:     #3498db;
+    --verde:          #1e7e34;
+    --verde-claro:    #e2f0d9;
+    --verde-borda:    #28a745;
+    --vermelho:       #9e2a2b;
+    --vermelho-claro: #fceade;
+    --vermelho-borda: #dc3545;
+    --amarelo:        #a0522d;
+    --amarelo-claro:  #fdf5e6;
+    --amarelo-borda:  #ff8c00;
+    --cinza-borda:    #cbd5e1;
+    --cinza-fundo:    #f8fafc;
+    --texto:          #1e293b;
+    --texto-sec:      #475569;
+    --branco:         #ffffff;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--cinza-fundo);
+    color: var(--texto);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--azul-primario);
+    color: var(--branco);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.01em; }
+  .header-left p { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
+  .progress-wrap { display: flex; align-items: center; gap: 14px; min-width: 240px; }
+  .progress-bar-bg { flex: 1; height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: #00d2ff; border-radius: 5px; transition: width 0.4s ease; width: 0%; }
+  .progress-label { font-size: 0.85rem; white-space: nowrap; opacity: 0.9; font-weight: 600; }
+
+  main { max-width: 880px; margin: 40px auto 80px; padding: 0 20px; }
+
+  /* TELA INÍCIO */
+  #tela-inicio {
+    background: var(--branco);
+    border-radius: 14px;
+    border: 1px solid var(--cinza-borda);
+    padding: 52px 44px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(13,35,58,0.07);
+  }
+  .badge {
+    display: inline-block;
+    background: var(--azul-claro);
+    color: var(--azul-medio);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+  }
+  #tela-inicio h2 { font-size: 2.1rem; color: var(--azul-primario); margin-bottom: 16px; font-weight: 800; }
+  #tela-inicio > p { color: var(--texto-sec); font-size: 1.05rem; max-width: 660px; margin: 0 auto 32px; line-height: 1.75; }
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 32px 0; }
+  .info-card { background: var(--azul-claro); border-radius: 10px; padding: 22px 16px; text-align: center; border: 1px solid rgba(52,152,219,0.15); }
+  .info-card .num { font-size: 2.4rem; font-weight: 800; color: var(--azul-primario); display: block; }
+  .info-card .desc { font-size: 0.85rem; color: var(--azul-medio); margin-top: 6px; font-weight: 600; }
+  .aviso { background: var(--amarelo-claro); border: 1px solid var(--amarelo-borda); border-radius: 10px; padding: 18px 22px; font-size: 0.95rem; color: #7a4000; text-align: left; margin: 24px 0 32px; line-height: 1.7; }
+  .aviso strong { color: #5a2d00; }
+  .topicos-lista { font-size: 0.9rem; color: var(--texto-sec); margin-bottom: 30px; line-height: 1.8; }
+  .topicos-lista strong { color: var(--texto); }
+
+  /* BOTÕES */
+  .btn-primario {
+    background: var(--azul-primario); color: var(--branco); border: none; border-radius: 8px;
+    padding: 14px 38px; font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: background 0.2s, transform 0.1s; letter-spacing: 0.02em;
+    box-shadow: 0 2px 8px rgba(13,35,58,0.2);
+  }
+  .btn-primario:hover { background: var(--azul-medio); transform: translateY(-1px); }
+  .btn-primario:active { transform: translateY(0); }
+  .btn-primario:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secundario { background: var(--branco); color: var(--azul-primario); border: 2px solid var(--azul-primario); border-radius: 8px; padding: 12px 28px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-secundario:hover { background: var(--azul-claro); }
+
+  /* CARD DE QUESTÃO */
+  #tela-questao { display: none; }
+  .questao-card { background: var(--branco); border-radius: 14px; border: 1px solid var(--cinza-borda); padding: 40px; box-shadow: 0 4px 24px rgba(13,35,58,0.07); }
+  .questao-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
+  .questao-num { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--azul-medio); background: var(--azul-claro); padding: 6px 16px; border-radius: 20px; }
+  .questao-tema { font-size: 0.8rem; font-weight: 600; color: var(--texto-sec); background: #f1f5f9; padding: 6px 16px; border-radius: 20px; }
+
+  /* CONTEXTO — FLUXOGRAMA / INFOGRÁFICO INLINE */
+  .questao-contexto-box { background: #f8fafc; border-left: 4px solid var(--azul-primario); padding: 18px 22px; margin-bottom: 24px; border-radius: 0 10px 10px 0; font-size: 0.98rem; color: var(--texto-sec); line-height: 1.75; }
+  .questao-contexto-box strong { color: var(--texto); }
+
+  /* FLUXOGRAMA SVG INLINE */
+  .fluxo-wrap { margin: 20px 0; overflow-x: auto; }
+  .fluxo-wrap svg { display: block; max-width: 100%; height: auto; }
+
+  /* INFOGRÁFICO TABELA */
+  .infotable { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.92rem; }
+  .infotable th { background: var(--azul-primario); color: var(--branco); padding: 10px 14px; text-align: left; font-weight: 700; }
+  .infotable td { padding: 9px 14px; border-bottom: 1px solid var(--cinza-borda); vertical-align: top; }
+  .infotable tr:nth-child(even) td { background: var(--azul-claro); }
+  .infotable .destaque { color: var(--vermelho); font-weight: 700; }
+  .infotable .ok { color: var(--verde); font-weight: 700; }
+
+  /* GRÁFICO ASCII */
+  .grafico-ascii { font-family: 'Courier New', monospace; background: #0f172a; color: #7dd3fc; padding: 20px; border-radius: 10px; margin: 20px 0; font-size: 0.84rem; line-height: 1.5; overflow-x: auto; white-space: pre; }
+
+  .questao-enunciado { font-size: 1.08rem; line-height: 1.8; color: var(--texto); margin-bottom: 32px; }
+  .questao-enunciado strong { color: var(--azul-primario); }
+
+  /* ALTERNATIVAS */
+  .alternativas { display: flex; flex-direction: column; gap: 14px; }
+  .alt-btn { display: flex; align-items: flex-start; gap: 16px; background: var(--branco); border: 2px solid var(--cinza-borda); border-radius: 10px; padding: 16px 20px; cursor: pointer; text-align: left; font-size: 0.97rem; color: var(--texto); transition: all 0.18s; line-height: 1.65; width: 100%; }
+  .alt-btn:hover:not(:disabled) { border-color: var(--azul-borda); background: var(--azul-hover); }
+  .alt-btn:disabled { cursor: default; }
+  .alt-letra { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 50%; background: var(--cinza-fundo); border: 2px solid var(--cinza-borda); font-weight: 700; font-size: 0.9rem; color: var(--azul-primario); flex-shrink: 0; transition: all 0.18s; }
+  .alt-btn:hover:not(:disabled) .alt-letra { background: var(--azul-claro); border-color: var(--azul-borda); }
+  .alt-btn.correta { border-color: var(--verde-borda); background: var(--verde-claro); }
+  .alt-btn.correta .alt-letra { background: var(--verde-borda); border-color: var(--verde-borda); color: white; }
+  .alt-btn.errada { border-color: var(--vermelho-borda); background: var(--vermelho-claro); }
+  .alt-btn.errada .alt-letra { background: var(--vermelho-borda); border-color: var(--vermelho-borda); color: white; }
+  .alt-btn.neutra-pos { border-color: #e2e8f0; background: #f8fafc; opacity: 0.55; }
+
+  /* SUBJETIVAS */
+  .subjetiva-input-box { margin-top: 24px; }
+  .subjetiva-textarea { width: 100%; height: 200px; padding: 16px; border: 2px solid var(--cinza-borda); border-radius: 10px; font-family: inherit; font-size: 1rem; resize: vertical; margin-bottom: 16px; outline: none; transition: border-color 0.2s; line-height: 1.7; }
+  .subjetiva-textarea:focus { border-color: var(--azul-borda); }
+
+  /* GABARITO COMENTADO */
+  .gabarito-box { margin-top: 28px; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--cinza-borda); display: none; }
+  .gabarito-header { display: flex; align-items: center; gap: 12px; padding: 16px 24px; font-weight: 700; font-size: 1rem; }
+  .gabarito-header.acerto { background: var(--verde-claro); color: var(--verde); border-bottom: 1.5px solid var(--verde-borda); }
+  .gabarito-header.erro { background: var(--vermelho-claro); color: var(--vermelho); border-bottom: 1.5px solid var(--vermelho-borda); }
+  .gabarito-header.subjetiva-info { background: var(--azul-claro); color: var(--azul-medio); border-bottom: 1.5px solid var(--azul-borda); }
+  .gabarito-icone { font-size: 1.4rem; }
+  .gabarito-body { background: var(--branco); padding: 26px; }
+  .gabarito-body h4 { font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--azul-medio); margin-bottom: 10px; font-weight: 700; }
+  .gabarito-body p { font-size: 1rem; color: var(--texto); line-height: 1.75; margin-bottom: 14px; }
+  .gabarito-body p:last-child { margin-bottom: 0; }
+  .gabarito-body strong { color: var(--azul-primario); }
+  .gabarito-body em { color: var(--texto-sec); font-style: italic; }
+  .gabarito-body code { background: #f1f5f9; padding: 2px 7px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.93em; color: var(--azul-medio); }
+  .por-que-erradas { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--cinza-borda); }
+  .por-que-erradas ul { list-style: none; padding: 0; margin-top: 10px; }
+  .por-que-erradas li { font-size: 0.95rem; color: var(--texto-sec); padding: 7px 0 7px 24px; position: relative; line-height: 1.65; }
+  .por-que-erradas li::before { content: '✗'; position: absolute; left: 0; color: var(--vermelho-borda); font-weight: 700; }
+  .por-que-erradas li.correta-item::before { content: '✓'; color: var(--verde-borda); }
+
+  /* BOTÃO PRÓXIMA */
+  .nav-questao { display: none; justify-content: flex-end; margin-top: 28px; }
+
+  /* TELA DIAGNÓSTICO */
+  #tela-diagnostico { display: none; }
+  .diag-header { background: var(--azul-primario); color: var(--branco); border-radius: 14px 14px 0 0; padding: 36px 44px; text-align: center; }
+  .diag-header h2 { font-size: 1.9rem; font-weight: 800; margin-bottom: 8px; }
+  .diag-header p { opacity: 0.85; font-size: 1rem; }
+  .diag-body { background: var(--branco); border: 1px solid var(--cinza-borda); border-top: none; border-radius: 0 0 14px 14px; padding: 40px; box-shadow: 0 4px 24px rgba(13,35,58,0.07); }
+
+  .placar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+  .placar-card { border-radius: 10px; padding: 24px 16px; text-align: center; border: 1.5px solid var(--cinza-borda); }
+  .placar-card .valor { font-size: 2.4rem; font-weight: 800; display: block; line-height: 1; }
+  .placar-card .label { font-size: 0.78rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+  .placar-card.acertos { background: var(--verde-claro); border-color: var(--verde-borda); }
+  .placar-card.acertos .valor, .placar-card.acertos .label { color: var(--verde); }
+  .placar-card.erros { background: var(--vermelho-claro); border-color: var(--vermelho-borda); }
+  .placar-card.erros .valor, .placar-card.erros .label { color: var(--vermelho); }
+  .placar-card.nota { background: var(--azul-claro); border-color: var(--azul-borda); }
+  .placar-card.nota .valor { color: var(--azul-primario); }
+  .placar-card.nota .label { color: var(--azul-medio); }
+  .placar-card.perc { background: #f1f5f9; }
+  .placar-card.perc .valor { color: var(--texto); }
+  .placar-card.perc .label { color: var(--texto-sec); }
+
+  .desempenho-barra-wrap { margin-bottom: 36px; }
+  .desempenho-barra-wrap h3 { font-size: 1.1rem; color: var(--azul-primario); font-weight: 700; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--azul-claro); }
+  .barra-tema { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .barra-tema-nome { font-size: 0.9rem; color: var(--texto); min-width: 270px; font-weight: 600; }
+  .barra-bg { flex: 1; height: 16px; background: #e2e8f0; border-radius: 8px; overflow: hidden; }
+  .barra-fill { height: 100%; border-radius: 8px; transition: width 0.9s ease; }
+  .barra-pct { font-size: 0.88rem; font-weight: 700; min-width: 44px; text-align: right; }
+
+  .diag-secao { margin-bottom: 36px; }
+  .diag-secao h3 { font-size: 1.1rem; font-weight: 700; color: var(--azul-primario); margin-bottom: 18px; padding-bottom: 8px; border-bottom: 2px solid var(--azul-claro); }
+  .diag-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px; border-radius: 10px; margin-bottom: 12px; border: 1px solid var(--cinza-borda); background: var(--branco); }
+  .diag-item.gargalo { border-color: var(--vermelho-borda); background: var(--vermelho-claro); }
+  .diag-item.acerto { border-color: var(--verde-borda); background: var(--verde-claro); }
+  .diag-icone { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+  .diag-texto { font-size: 0.95rem; line-height: 1.65; }
+  .diag-texto strong { color: var(--azul-primario); }
+
+  .rec-card { background: var(--azul-claro); border: 1.5px solid var(--azul-borda); border-radius: 10px; padding: 22px 26px; margin-bottom: 16px; }
+  .rec-card h4 { font-size: 0.95rem; font-weight: 700; color: var(--azul-primario); margin-bottom: 10px; }
+  .rec-card p { font-size: 0.95rem; color: var(--texto-sec); line-height: 1.65; }
+  .aulas-tag { display: inline-block; background: var(--azul-primario); color: var(--branco); font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: 12px; margin: 8px 6px 0 0; }
+
+  .btn-refazer-wrap { text-align: center; margin-top: 40px; }
+
+  /* MAPA MENTAL SVG */
+  .mapa-mental-wrap { margin: 20px 0; background: #f8fafc; border-radius: 10px; padding: 16px; border: 1px solid var(--cinza-borda); overflow-x: auto; }
+
+  @media (max-width: 768px) {
+    .questao-card { padding: 24px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .placar-grid { grid-template-columns: repeat(2, 1fr); }
+    .barra-tema-nome { min-width: 140px; font-size: 0.82rem; }
+    header { flex-direction: column; gap: 14px; align-items: flex-start; }
+    .progress-wrap { width: 100%; }
+    #tela-inicio { padding: 32px 20px; }
+    .diag-body { padding: 24px 20px; }
+    .barra-tema { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Simulado de Business Intelligence</h1>
+    <p>Preparação para a Prova · Administração 5º Semestre · Tomada de Decisão Gerencial</p>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <span class="progress-label" id="progressLabel">0 / 7</span>
+  </div>
+</header>
+
+<main>
+
+<!-- TELA INÍCIO -->
+<div id="tela-inicio">
+  <div class="badge">Revisão de Alta Performance</div>
+  <h2>Simulado Preparatório de BI</h2>
+  <p>Desenvolvido para consolidar as competências de análise de dados, governança, modelagem e design estratégico aplicadas à tomada de decisão executiva. Cada questão exige que você pense e aja como um administrador que usa dados para resolver problemas reais de negócios.</p>
+
+  <div class="info-grid">
+    <div class="info-card"><span class="num">5</span><div class="desc">Questões Objetivas</div></div>
+    <div class="info-card"><span class="num">2</span><div class="desc">Questões Subjetivas</div></div>
+    <div class="info-card"><span class="num">100%</span><div class="desc">Gabarito Comentado</div></div>
+  </div>
+
+  <div class="aviso">
+    <strong>Como funciona:</strong> Uma questão por vez. Nas objetivas, o gabarito comentado aparece imediatamente após sua resposta, explicando o raciocínio de cada alternativa. Nas subjetivas, você elabora sua análise e acessa o espelho de correção oficial para autoavaliação. Ao final, o sistema gera um <strong>Dashboard de Diagnóstico</strong> apontando seus gargalos de conteúdo e indicando as apostilas exatas para revisão.
+  </div>
+
+  <p class="topicos-lista">
+    <strong>Conteúdos cobrados:</strong> Hierarquia DIKW e KPIs · Modelagem Dimensional (Star Schema) · Fórmulas DAX e Contexto de Avaliação · Storytelling e Atributos Pré-Atentativos · ETL e Qualidade de Dados · Benchmarking e CHAF.
+  </p>
+
+  <button class="btn-primario" onclick="iniciarSimulado()">Iniciar Simulado</button>
+</div>
+
+<!-- TELA QUESTÃO -->
+<div id="tela-questao">
+  <div class="questao-card">
+    <div class="questao-meta">
+      <span class="questao-num" id="questaoNum">Questão 1 de 7</span>
+      <span class="questao-tema" id="questaoTema">Tema</span>
+    </div>
+    <div class="questao-contexto-box" id="questaoContexto" style="display:none;"></div>
+    <div id="questaoVisual"></div>
+    <div class="questao-enunciado" id="questaoEnunciado"></div>
+    <div class="alternativas" id="alternativas"></div>
+    <div class="subjetiva-input-box" id="subjetivaInputBox" style="display:none;">
+      <textarea class="subjetiva-textarea" id="subjetivaResposta" placeholder="Elabore sua resposta com rigor analítico. Argumente como um administrador que toma decisões com base em dados e conceitos de BI..."></textarea>
+      <button class="btn-primario" id="btnEnviarSubjetiva" onclick="enviarSubjetiva()">Enviar Resposta</button>
+    </div>
+    <div class="gabarito-box" id="gabaritoBox">
+      <div class="gabarito-header" id="gabaritoHeader">
+        <span class="gabarito-icone" id="gabaritoIcone"></span>
+        <span id="gabaritoTitulo"></span>
+      </div>
+      <div class="gabarito-body">
+        <h4 id="gabaritoSubtitulo">Por que esta é a resposta correta?</h4>
+        <p id="gabaritoExplicacao"></p>
+        <div class="por-que-erradas" id="porQueErradas"></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-questao" id="navQuestao">
+    <button class="btn-primario" id="btnProxima" onclick="proximaQuestao()">Próxima questão →</button>
+  </div>
+</div>
+
+<!-- TELA DIAGNÓSTICO -->
+<div id="tela-diagnostico">
+  <div class="diag-header">
+    <h2>Dashboard de Diagnóstico de Desempenho</h2>
+    <p>Simulado concluído · Análise estratégica dos seus gargalos de conteúdo</p>
+  </div>
+  <div class="diag-body">
+    <div class="placar-grid">
+      <div class="placar-card acertos"><span class="valor" id="diagAcertos">—</span><div class="label">Acertos (Obj)</div></div>
+      <div class="placar-card erros"><span class="valor" id="diagErros">—</span><div class="label">Erros (Obj)</div></div>
+      <div class="placar-card nota"><span class="valor" id="diagNota">—</span><div class="label">Nota Final (0–10)</div></div>
+      <div class="placar-card perc"><span class="valor" id="diagPerc">—</span><div class="label">Aproveitamento</div></div>
+    </div>
+    <div class="desempenho-barra-wrap">
+      <h3>Desempenho por Competência Analítica</h3>
+      <div id="barrasTemas"></div>
+    </div>
+    <div class="diag-secao">
+      <h3>Análise de Gargalos e Pontos Críticos</h3>
+      <div id="analiseDetalhada"></div>
+    </div>
+    <div class="diag-secao">
+      <h3>Plano de Estudos e Revisão Recomendado</h3>
+      <div id="recomendacoes"></div>
+    </div>
+    <div class="btn-refazer-wrap">
+      <button class="btn-secundario" onclick="refazerSimulado()" style="margin-right:12px">↺ Refazer Simulado</button>
+      <button class="btn-primario" onclick="voltarInicio()">← Voltar ao Início</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// BANCO DE QUESTÕES — CONTEXTOS INÉDITOS (BI · ADM 5º SEMESTRE)
+// ═══════════════════════════════════════════════════════════════════════════
+const questoes = [
+
+  // ─── Q1: MODELAGEM DIMENSIONAL — CASO REDE DE ACADEMIAS ─────────────────
+  {
+    id: 1,
+    tipo: 'objetiva',
+    tema: 'Modelagem Dimensional (Star Schema)',
+    contexto: '<strong>Contexto Gerencial:</strong> A rede de academias <strong>FitPrime</strong> opera 48 unidades no Brasil e acaba de contratar uma consultoria de BI para construir um modelo analítico de desempenho comercial. O analista responsável propôs um modelo <strong>Snowflake</strong>, normalizando a dimensão de planos de assinatura em três tabelas encadeadas: <em>Dim_Plano → Dim_Categoria_Plano → Dim_Segmento_Cliente</em>. Após a primeira carga de dados, o Diretor Comercial reclamou que os relatórios de churn (cancelamento) por tipo de plano demoram mais de 8 minutos para renderizar no Power BI, inviabilizando as reuniões de gestão.',
+    visual: `<div class="fluxo-wrap">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" style="max-width:720px;">
+  <!-- Snowflake atual -->
+  <rect x="10" y="70" width="130" height="60" rx="8" fill="#fceade" stroke="#dc3545" stroke-width="2"/>
+  <text x="75" y="97" text-anchor="middle" font-size="12" font-weight="bold" fill="#9e2a2b">Dim_Segmento</text>
+  <text x="75" y="113" text-anchor="middle" font-size="11" fill="#9e2a2b">(Normalizada)</text>
+  <line x1="140" y1="100" x2="170" y2="100" stroke="#dc3545" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="170" y="70" width="130" height="60" rx="8" fill="#fceade" stroke="#dc3545" stroke-width="2"/>
+  <text x="235" y="97" text-anchor="middle" font-size="12" font-weight="bold" fill="#9e2a2b">Dim_Categoria</text>
+  <text x="235" y="113" text-anchor="middle" font-size="11" fill="#9e2a2b">(Normalizada)</text>
+  <line x1="300" y1="100" x2="330" y2="100" stroke="#dc3545" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="330" y="70" width="110" height="60" rx="8" fill="#fceade" stroke="#dc3545" stroke-width="2"/>
+  <text x="385" y="97" text-anchor="middle" font-size="12" font-weight="bold" fill="#9e2a2b">Dim_Plano</text>
+  <text x="385" y="113" text-anchor="middle" font-size="11" fill="#9e2a2b">(Normalizada)</text>
+  <line x1="440" y1="100" x2="470" y2="100" stroke="#dc3545" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="470" y="60" width="130" height="80" rx="8" fill="#eef4f8" stroke="#3498db" stroke-width="2"/>
+  <text x="535" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="#0d233a">Fato_Assinaturas</text>
+  <text x="535" y="108" text-anchor="middle" font-size="11" fill="#1c4263">Churn · MRR</text>
+  <text x="535" y="124" text-anchor="middle" font-size="11" fill="#1c4263">Cancelamentos</text>
+  <!-- Label -->
+  <text x="240" y="25" text-anchor="middle" font-size="13" font-weight="bold" fill="#9e2a2b">Modelo Atual: Snowflake (3 Joins em Cascata → Lento)</text>
+  <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#dc3545"/></marker></defs>
+</svg>
+</div>`,
+    enunciado: 'Diante do gargalo de performance identificado, qual decisão de modelagem o gestor de BI deve adotar para garantir que os relatórios de churn da FitPrime sejam gerados em tempo hábil para a tomada de decisão gerencial?',
+    alternativas: [
+      'Manter o modelo Snowflake e solicitar à equipe de TI a contratação de um servidor dedicado de alta performance para o Power BI, pois a normalização até a 3FN é a única forma de garantir a integridade referencial dos dados de assinatura em ambientes analíticos de grande escala.',
+      'Desnormalizar o modelo para o Star Schema, incorporando os atributos de Dim_Categoria_Plano e Dim_Segmento_Cliente diretamente em uma única tabela Dim_Plano, eliminando os joins em cascata e reduzindo drasticamente o tempo de processamento das consultas de churn.',
+      'Ativar os filtros bidirecionais (cross-filter direction: both) em todos os relacionamentos do modelo, pois essa configuração permite que o motor VertiPaq do Power BI paralelize automaticamente os joins entre as três tabelas de dimensão normalizadas.',
+      'Transformar a tabela Fato_Assinaturas em uma tabela de dimensão estática e criar uma nova tabela fato contendo apenas os totais mensais de churn por unidade, eliminando a granularidade transacional para reduzir o volume de linhas processadas.',
+      'Migrar todo o modelo de dados para o Microsoft Excel com tabelas dinâmicas, pois a ausência de relacionamentos formais entre planilhas elimina os gargalos de join e garante maior velocidade de atualização dos relatórios gerenciais.'
+    ],
+    correta: 1,
+    explicacao: 'No contexto analítico (OLAP), o <strong>Star Schema</strong> é amplamente preferido ao Snowflake porque desnormaliza as dimensões, reunindo atributos correlacionados em uma única tabela. Isso elimina os <em>joins</em> em cascata que o motor VertiPaq precisa resolver a cada consulta. No caso da FitPrime, unir Dim_Segmento, Dim_Categoria e Dim_Plano em uma única <strong>Dim_Plano</strong> desnormalizada reduz de 3 para 1 o número de relacionamentos necessários para filtrar um relatório de churn, com ganho expressivo de performance.',
+    porQueErradas: [
+      { letra: 'A', texto: 'Adquirir hardware mais potente é uma solução de custo elevado que não resolve o problema estrutural do modelo de dados. O gargalo é arquitetural, não de infraestrutura.' },
+      { letra: 'B', texto: 'CORRETA — Desnormalização via Star Schema elimina os joins em cascata e otimiza o processamento analítico no Power BI.', correta: true },
+      { letra: 'C', texto: 'Filtros bidirecionais em massa criam ambiguidade nos caminhos de filtragem, aumentam o risco de resultados incorretos e degradam ainda mais a performance do modelo.' },
+      { letra: 'D', texto: 'Eliminar a granularidade transacional destrói a capacidade de análise de churn individual por cliente e por plano, que é exatamente o que o Diretor Comercial precisa.' },
+      { letra: 'E', texto: 'Migrar para Excel com tabelas dinâmicas representa um retrocesso analítico grave, eliminando as capacidades de modelagem, DAX e atualização automática do Power BI.' }
+    ]
+  },
+
+  // ─── Q2: DAX — CASO REDE DE FRANQUIAS DE ALIMENTAÇÃO ────────────────────
+  {
+    id: 2,
+    tipo: 'objetiva',
+    tema: 'Cálculos Avançados em DAX',
+    contexto: '<strong>Contexto Gerencial:</strong> A rede de franquias de alimentação saudável <strong>GreenBowl</strong> possui 32 lojas e monitora o <strong>Ticket Médio</strong> de cada unidade no Power BI. O analista de BI criou uma <strong>coluna calculada</strong> na tabela Fato_Pedidos com a fórmula: <code>Ticket_Linha = Fato_Pedidos[Valor_Total] / Fato_Pedidos[Qtd_Itens]</code>. Em seguida, adicionou essa coluna a um visual de cartão configurado para exibir a <strong>Média</strong>. O resultado apresentado foi R$ 38,70. Porém, o sistema de PDV (ponto de venda) da franqueadora aponta que o ticket médio real do período é R$ 52,40.',
+    visual: `<table class="infotable">
+  <thead><tr><th>Pedido</th><th>Valor Total (R$)</th><th>Qtd Itens</th><th>Ticket_Linha (Coluna)</th></tr></thead>
+  <tbody>
+    <tr><td>P-001</td><td>12,00</td><td>1</td><td>12,00</td></tr>
+    <tr><td>P-002</td><td>85,00</td><td>3</td><td>28,33</td></tr>
+    <tr><td>P-003</td><td>210,00</td><td>4</td><td>52,50</td></tr>
+    <tr><td>P-004</td><td>9,00</td><td>1</td><td>9,00</td></tr>
+    <tr><td><strong>Média Simples das Linhas</strong></td><td>—</td><td>—</td><td class="destaque">25,46 ← Distorcido</td></tr>
+    <tr><td><strong>Ticket Médio Real</strong></td><td>316,00</td><td>9</td><td class="ok">35,11 ← Correto</td></tr>
+  </tbody>
+</table>`,
+    enunciado: 'Como gestor analítico de BI da GreenBowl, qual é o diagnóstico preciso da divergência entre os sistemas e qual expressão DAX deve ser implementada para corrigir o cálculo do Ticket Médio no dashboard gerencial?',
+    alternativas: [
+      'A divergência ocorre porque o Power BI arredonda automaticamente os valores decimais das colunas calculadas ao carregar os dados; a solução é formatar a coluna Ticket_Linha com 4 casas decimais e recalcular a média utilizando a função ROUND combinada com AVERAGE.',
+      'O erro decorre do uso de uma coluna calculada com agregação por média aritmética simples, que trata pedidos de R$ 9 e de R$ 210 com o mesmo peso; a solução é criar uma Medida DAX com a expressão: <code>Ticket_Médio = DIVIDE(SUM(Fato_Pedidos[Valor_Total]), SUM(Fato_Pedidos[Qtd_Itens]))</code>.',
+      'A divergência é causada pela ausência de uma função USERELATIONSHIP ativa entre as tabelas de dimensão e a tabela fato; a solução é recriar todos os relacionamentos do modelo como bidirecionais para que o contexto de filtro seja propagado corretamente ao calcular a média.',
+      'O cálculo está incorreto porque o Power BI não suporta divisão direta entre colunas de tipos de dados diferentes (moeda e inteiro); a solução é converter ambas as colunas para o tipo Número Decimal Fixo antes de realizar qualquer operação aritmética no modelo.',
+      'O sistema de PDV está com o cálculo incorreto por não considerar os pedidos cancelados e as devoluções do período; a solução gerencial é desconsiderar o PDV e adotar o valor de R$ 38,70 do Power BI como o indicador oficial de ticket médio da rede.'
+    ],
+    correta: 1,
+    explicacao: 'Colunas calculadas são avaliadas linha a linha no contexto de linha da tabela. Quando calculamos o valor por item em cada linha e depois tiramos a <strong>média aritmética simples</strong> dessas linhas, tratamos um pedido de R$ 9 com o mesmo peso de um pedido de R$ 210, gerando uma distorção grave (média das razões ≠ razão das médias). A <strong>Medida DAX</strong> com <code>DIVIDE(SUM([Valor_Total]), SUM([Qtd_Itens]))</code> soma primeiro todos os valores e todas as quantidades do contexto de filtro atual e só então realiza a divisão, produzindo o ticket médio real ponderado.',
+    porQueErradas: [
+      { letra: 'A', texto: 'O problema não é de arredondamento de casas decimais, mas sim de lógica de agregação. Aumentar a precisão decimal não altera o resultado da média aritmética simples.' },
+      { letra: 'B', texto: 'CORRETA — A Medida DAX com SUM/DIVIDE respeita o peso de cada transação e calcula o ticket médio real do contexto de filtro selecionado.', correta: true },
+      { letra: 'C', texto: 'USERELATIONSHIP é usada para ativar relacionamentos inativos (ex: múltiplas relações com uma tabela de datas). Não resolve erros de lógica de agregação em colunas calculadas.' },
+      { letra: 'D', texto: 'O Power BI suporta divisão entre qualquer tipo numérico. O problema é exclusivamente a lógica de cálculo linha a linha versus agregação consolidada.' },
+      { letra: 'E', texto: 'Desconsiderar o sistema financeiro oficial e adotar um indicador matematicamente incorreto como meta é uma decisão que viola os princípios básicos de governança de dados e liderança orientada a dados.' }
+    ]
+  },
+
+  // ─── Q3: VISUALIZAÇÃO / GESTALT — CASO CONSTRUTORA ──────────────────────
+  {
+    id: 3,
+    tipo: 'objetiva',
+    tema: 'Storytelling e Atributos Pré-Atentativos',
+    contexto: '<strong>Contexto Gerencial:</strong> O Diretor de Engenharia da construtora <strong>AltoPlano Engenharia</strong> reclamou que o painel de acompanhamento de obras é confuso. O dashboard atual exibe: (1) um gráfico de pizza com 14 fatias representando o percentual de avanço físico de cada obra; (2) uma tabela com 200 linhas de dados brutos de medições diárias sem formatação condicional; e (3) um gráfico de barras 3D com gradiente de cores aleatórias para o custo acumulado. O Diretor leva mais de 15 minutos para identificar quais obras estão com atraso crítico em relação ao cronograma.',
+    visual: `<div class="mapa-mental-wrap">
+<svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;">
+  <!-- Centro -->
+  <ellipse cx="340" cy="130" rx="80" ry="38" fill="#0d233a"/>
+  <text x="340" y="126" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Dashboard</text>
+  <text x="340" y="142" text-anchor="middle" font-size="11" fill="#7dd3fc">Eficaz</text>
+  <!-- Ramo 1: Reduzir Ruído -->
+  <line x1="265" y1="110" x2="170" y2="65" stroke="#28a745" stroke-width="2"/>
+  <rect x="60" y="38" width="115" height="52" rx="8" fill="#e2f0d9" stroke="#28a745" stroke-width="1.5"/>
+  <text x="117" y="61" text-anchor="middle" font-size="11" font-weight="bold" fill="#1e7e34">Reduzir Ruído</text>
+  <text x="117" y="77" text-anchor="middle" font-size="10" fill="#1e7e34">Remover 3D, grades</text>
+  <text x="117" y="91" text-anchor="middle" font-size="10" fill="#1e7e34">e cores aleatórias</text>
+  <!-- Ramo 2: Cor Intencional -->
+  <line x1="265" y1="140" x2="160" y2="140" stroke="#3498db" stroke-width="2"/>
+  <rect x="40" y="116" width="125" height="48" rx="8" fill="#eef4f8" stroke="#3498db" stroke-width="1.5"/>
+  <text x="102" y="138" text-anchor="middle" font-size="11" font-weight="bold" fill="#1c4263">Cor Intencional</text>
+  <text x="102" y="154" text-anchor="middle" font-size="10" fill="#1c4263">Cinza = padrão</text>
+  <text x="102" y="166" text-anchor="middle" font-size="10" fill="#1c4263">Vermelho = crítico</text>
+  <!-- Ramo 3: Gráfico Certo -->
+  <line x1="265" y1="158" x2="170" y2="195" stroke="#ff8c00" stroke-width="2"/>
+  <rect x="55" y="172" width="120" height="48" rx="8" fill="#fdf5e6" stroke="#ff8c00" stroke-width="1.5"/>
+  <text x="115" y="194" text-anchor="middle" font-size="11" font-weight="bold" fill="#a0522d">Gráfico Certo</text>
+  <text x="115" y="210" text-anchor="middle" font-size="10" fill="#a0522d">Barras para comparar</text>
+  <text x="115" y="222" text-anchor="middle" font-size="10" fill="#a0522d">Não pizza com 14 fatias</text>
+  <!-- Ramo 4: Hierarquia Visual -->
+  <line x1="415" y1="110" x2="510" y2="65" stroke="#9b59b6" stroke-width="2"/>
+  <rect x="500" y="38" width="130" height="52" rx="8" fill="#f5eef8" stroke="#9b59b6" stroke-width="1.5"/>
+  <text x="565" y="61" text-anchor="middle" font-size="11" font-weight="bold" fill="#6c3483">Hierarquia Visual</text>
+  <text x="565" y="77" text-anchor="middle" font-size="10" fill="#6c3483">KPIs no topo</text>
+  <text x="565" y="91" text-anchor="middle" font-size="10" fill="#6c3483">Detalhes embaixo</text>
+  <!-- Ramo 5: Pré-Atentativos -->
+  <line x1="415" y1="140" x2="520" y2="140" stroke="#e74c3c" stroke-width="2"/>
+  <rect x="515" y="116" width="140" height="48" rx="8" fill="#fceade" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="585" y="138" text-anchor="middle" font-size="11" font-weight="bold" fill="#9e2a2b">Pré-Atentativos</text>
+  <text x="585" y="154" text-anchor="middle" font-size="10" fill="#9e2a2b">Cor, tamanho, posição</text>
+  <text x="585" y="166" text-anchor="middle" font-size="10" fill="#9e2a2b">para guiar o olhar</text>
+  <!-- Ramo 6: Narrativa -->
+  <line x1="415" y1="158" x2="510" y2="195" stroke="#1abc9c" stroke-width="2"/>
+  <rect x="500" y="172" width="130" height="48" rx="8" fill="#eafaf1" stroke="#1abc9c" stroke-width="1.5"/>
+  <text x="565" y="194" text-anchor="middle" font-size="11" font-weight="bold" fill="#1a7a4a">Narrativa (BING)</text>
+  <text x="565" y="210" text-anchor="middle" font-size="10" fill="#1a7a4a">Bing / Bang / Bongo</text>
+  <text x="565" y="222" text-anchor="middle" font-size="10" fill="#1a7a4a">Contexto → Causa → Ação</text>
+</svg>
+</div>`,
+    enunciado: 'Para reestruturar o dashboard da AltoPlano Engenharia com base nos princípios de Storytelling com Dados e nos atributos pré-atentativos, qual conjunto de decisões de design o analista de BI deve implementar?',
+    alternativas: [
+      'Substituir o gráfico de pizza de 14 fatias por um gráfico de rosca (donut) com as mesmas 14 categorias e adicionar rótulos percentuais em cada fatia, pois a abertura central do gráfico de rosca facilita a leitura comparativa de proporções entre obras de diferentes portes.',
+      'Eliminar o gráfico 3D e a tabela de 200 linhas sem formatação; adotar barras horizontais simples para o avanço físico de cada obra, aplicar cinza para obras dentro do prazo e vermelho escuro apenas para obras com atraso superior a 10%, e inserir uma caixa de narrativa no padrão Bing/Bang/Bongo no topo do painel.',
+      'Aumentar o tamanho da tabela de 200 linhas para que ocupe toda a tela do dashboard, pois gestores de engenharia preferem trabalhar com dados brutos e detalhados em vez de visualizações simplificadas que podem ocultar desvios técnicos relevantes.',
+      'Manter o gráfico de pizza e o gráfico de barras 3D, mas adicionar um filtro de data no topo do painel para que o Diretor possa selecionar manualmente o período de análise e reduzir o volume de dados exibidos de forma interativa.',
+      'Criar um painel com 20 gráficos de velocímetro (gauge charts) — um por obra — com escalas de cores em degradê do verde ao vermelho, distribuídos em uma grade de 4 colunas por 5 linhas, para que o Diretor visualize o status de todas as obras simultaneamente.'
+    ],
+    correta: 1,
+    explicacao: 'A reestruturação proposta aplica os três pilares do Storytelling com Dados de Knaflic: <strong>(1) Eliminar o ruído</strong> (remover 3D e tabelas brutas sem contexto); <strong>(2) Usar cor de forma intencional</strong> (cinza para o padrão, vermelho apenas para desvios críticos — atributo pré-atentativo de cor); e <strong>(3) Inserir narrativa</strong> (caixa Bing/Bang/Bongo que contextualiza o dado, aponta a causa e recomenda a ação). Barras horizontais são superiores a pizza para comparar valores entre muitas categorias, pois nosso sistema visual compara comprimentos com muito mais precisão do que ângulos ou áreas.',
+    porQueErradas: [
+      { letra: 'A', texto: 'Gráficos de rosca com 14 categorias têm o mesmo problema do gráfico de pizza: o cérebro humano não compara ângulos com precisão. O número de fatias é o problema central, não o formato.' },
+      { letra: 'B', texto: 'CORRETA — Barras simples + cor intencional + narrativa Bing/Bang/Bongo reduzem o tempo de decisão do Diretor de 15 minutos para segundos.', correta: true },
+      { letra: 'C', texto: 'Tabelas de 200 linhas sem formatação condicional exigem leitura sequencial e são inadequadas para monitoramento executivo rápido. Dados brutos pertencem ao nível operacional, não ao estratégico.' },
+      { letra: 'D', texto: 'Adicionar um filtro de data não resolve o problema estrutural de design (gráfico de pizza com 14 fatias e barras 3D). O gargalo é de percepção visual, não de volume de dados.' },
+      { letra: 'E', texto: 'Velocímetros (gauges) consomem muito espaço visual para transmitir pouca informação e são considerados por Stephen Few como um dos tipos de gráfico menos eficientes para comparação entre múltiplas entidades.' }
+    ]
+  },
+
+  // ─── Q4: ETL / QUALIDADE — CASO AGRONEGÓCIO ─────────────────────────────
+  {
+    id: 4,
+    tipo: 'objetiva',
+    tema: 'ETL e Qualidade de Dados',
+    contexto: '<strong>Contexto Gerencial:</strong> A cooperativa agrícola <strong>CerradoGrãos</strong> integrou três sistemas legados diferentes (ERP de produção, planilhas de campo e sistema de pesagem de grãos) em um único pipeline de dados para o Power BI. Durante a validação da primeira carga, o analista de BI identificou as seguintes inconsistências: (1) a coluna <em>Safra</em> contém os valores "2024/25", "2024-25" e "Safra 24/25" para o mesmo período; (2) a coluna <em>Produtividade_sc_ha</em> (sacas por hectare) apresenta 22% de valores nulos, pois algumas fazendas ainda não enviaram os laudos técnicos; (3) a coluna <em>Preco_Soja_USD</em> possui registros com vírgula como separador decimal (padrão BR) e registros com ponto (padrão EUA) misturados.',
+    visual: `<table class="infotable">
+  <thead><tr><th>Problema Identificado</th><th>Impacto Analítico</th><th>Risco de Decisão</th></tr></thead>
+  <tbody>
+    <tr><td>Coluna Safra: 3 formatos distintos</td><td>Filtros de safra retornam dados fragmentados</td><td class="destaque">Alto — relatórios de safra incorretos</td></tr>
+    <tr><td>22% de nulos em Produtividade</td><td>Média de produtividade subestimada</td><td class="destaque">Alto — metas de produção distorcidas</td></tr>
+    <tr><td>Separador decimal misto (,/.)</td><td>Valores numéricos lidos como texto</td><td class="destaque">Crítico — cálculos financeiros inviáveis</td></tr>
+  </tbody>
+</table>`,
+    enunciado: 'Como gestor de BI da CerradoGrãos, qual é a abordagem correta de tratamento dessas inconsistências na etapa de transformação do pipeline de dados (ETL/Power Query), garantindo a confiabilidade das análises de produtividade e precificação para a diretoria da cooperativa?',
+    alternativas: [
+      'Carregar os dados brutos no modelo sem tratamento e criar três medidas DAX separadas — uma para cada formato de safra identificado — que somem os valores de cada variação textual individualmente, consolidando os resultados em um único visual por meio de uma tabela de parâmetros.',
+      'No Power Query, padronizar a coluna Safra para um único formato textual ("2024/25") usando a função Substituir Valores; substituir os nulos de Produtividade pelo valor mediano do grupo (fazendas de mesmo porte e região) para preservar a distribuição estatística; e converter a coluna de preço para tipo Número Decimal com localidade definida para tratar o separador corretamente.',
+      'Excluir todas as linhas que contenham qualquer tipo de inconsistência — nulos, formatos divergentes ou separadores mistos — pois a integridade do modelo de dados exige que apenas registros 100% completos e padronizados sejam carregados no ambiente analítico da cooperativa.',
+      'Solicitar ao fornecedor do ERP de produção que corrija retroativamente todos os registros históricos diretamente no banco de dados de origem antes de realizar qualquer nova carga de dados no Power BI, suspendendo os relatórios gerenciais até a conclusão do saneamento completo.',
+      'Manter os três formatos da coluna Safra como estão e orientar os gestores a aplicarem manualmente os três filtros disponíveis no slicer do Power BI sempre que precisarem analisar um período específico, pois a padronização textual é uma responsabilidade exclusiva da área de TI.'
+    ],
+    correta: 1,
+    explicacao: 'O processo de <strong>ETL</strong> (Extract, Transform, Load) existe precisamente para resolver inconsistências de origem antes que os dados cheguem ao modelo analítico. Padronizar textos com Substituir Valores garante que os filtros de safra funcionem corretamente. Substituir nulos pela mediana do grupo (em vez de excluir as linhas ou usar a média global) é uma prática estatisticamente sólida que preserva a distribuição dos dados sem distorcer as análises de produtividade. Definir a localidade correta para a coluna de preço resolve o problema do separador decimal sem perda de dados.',
+    porQueErradas: [
+      { letra: 'A', texto: 'Criar medidas DAX para cada variação textual é um paliativo que não resolve o problema na fonte. O modelo continuará fragmentado e qualquer novo formato de safra exigirá uma nova medida.' },
+      { letra: 'B', texto: 'CORRETA — Tratamento no Power Query com padronização, imputação por mediana e definição de localidade garante dados confiáveis para a tomada de decisão.', correta: true },
+      { letra: 'C', texto: 'Excluir 22% dos registros de produtividade e todas as linhas com inconsistências pode eliminar uma parcela significativa da safra, tornando as análises de produtividade da cooperativa estatisticamente inválidas.' },
+      { letra: 'D', texto: 'Suspender os relatórios gerenciais por tempo indeterminado paralisa a gestão estratégica da cooperativa. O ETL existe justamente para mitigar problemas de qualidade na camada analítica enquanto os sistemas de origem são corrigidos.' },
+      { letra: 'E', texto: 'Transferir a responsabilidade de padronização para o usuário final é uma falha grave de governança de dados. O analista de BI é responsável por entregar dados limpos e confiáveis ao tomador de decisão.' }
+    ]
+  },
+
+  // ─── Q5: KPIs / CHAF / PRESCRITIVO — CASO LOGÍSTICA E-COMMERCE ──────────
+  {
+    id: 5,
+    tipo: 'objetiva',
+    tema: 'KPIs, CHAF e Análise Prescritiva',
+    contexto: '<strong>Contexto Gerencial:</strong> A operadora logística de e-commerce <strong>VeloLog</strong> atende 1.200 lojistas e monitora o desempenho de entrega em seu dashboard de BI. O benchmarking interno revelou que as rotas operadas por parceiros transportadores com avaliação abaixo de 3,5 estrelas no sistema de qualidade geram 4,3 vezes mais ocorrências de atraso do que as rotas operadas por parceiros com avaliação acima de 4,5 estrelas. O Diretor de Operações quer evoluir o BI do nível diagnóstico (identificar atrasos passados) para o nível <strong>prescritivo</strong>, reduzindo proativamente as ocorrências antes que o cliente final seja impactado.',
+    visual: `<div class="grafico-ascii">  Ocorrências de Atraso por Faixa de Avaliação do Transportador
+  ▲
+  │ ████████████████████████  4,3x mais atrasos
+  │ (Avaliação < 3,5 ★)
+  │
+  │ ██████████
+  │ (Avaliação 3,5 – 4,4 ★)
+  │
+  │ █████  (baseline)
+  │ (Avaliação ≥ 4,5 ★)
+  └──────────────────────────────────────────────────────▶
+     0      50     100    150    200    250  Ocorrências/mês</div>`,
+    enunciado: 'Para que a VeloLog implemente com sucesso uma solução de BI Prescritivo alinhada ao desenvolvimento de liderança orientada a dados (Framework CHAF), qual deve ser o foco e o escopo da solução analítica desenvolvida pelo gestor de BI?',
+    alternativas: [
+      'Gerar um relatório mensal em PDF com o ranking dos 10 transportadores com maior número de atrasos no período, encaminhando o documento por e-mail ao Diretor de Operações para que ele decida manualmente quais contratos devem ser rescindidos na próxima reunião de diretoria.',
+      'Desenvolver um modelo integrado ao dashboard que, ao identificar que um transportador atingiu o limiar de 3,5 estrelas de avaliação, acione automaticamente um alerta para o gestor de rota com a recomendação de redistribuição das entregas daquele parceiro para transportadores com avaliação superior, antes que os atrasos se materializem.',
+      'Criar um painel de monitoramento em tempo real que exiba a cotação das ações das principais empresas de logística listadas na B3, com o objetivo de identificar oportunidades de aquisição de concorrentes que possam ampliar a frota da VeloLog e reduzir os atrasos estruturalmente.',
+      'Centralizar todas as decisões de alocação de rotas na experiência do Diretor de Operações, utilizando o dashboard de BI apenas como um repositório de histórico de ocorrências para consulta eventual em auditorias internas e externas da operação logística.',
+      'Automatizar o bloqueio imediato e permanente de todos os transportadores com avaliação abaixo de 4,0 estrelas no sistema, sem análise contextual adicional, pois a correlação entre avaliação e atraso identificada no benchmarking é suficiente para justificar a exclusão automática desses parceiros.'
+    ],
+    correta: 1,
+    explicacao: 'A análise <strong>prescritiva</strong> vai além de identificar o que aconteceu (descritiva) ou o que vai acontecer (preditiva): ela <strong>recomenda a melhor ação</strong> e, quando possível, automatiza ou facilita a tomada de decisão antes que o problema se materialize. Na VeloLog, o alerta proativo de redistribuição de rotas quando um transportador atinge o limiar de risco é o exemplo clássico de prescrição orientada a dados — o sistema não apenas informa, mas orienta a decisão do gestor com base em evidências quantitativas do benchmarking.',
+    porQueErradas: [
+      { letra: 'A', texto: 'Relatórios mensais em PDF pertencem ao nível analítico descritivo. Chegam tarde demais para evitar o impacto no cliente final, que já foi prejudicado pelo atraso.' },
+      { letra: 'B', texto: 'CORRETA — O alerta proativo com recomendação de redistribuição antes do atraso é a essência do BI Prescritivo aplicado à operação logística.', correta: true },
+      { letra: 'C', texto: 'Monitorar cotações de ações de concorrentes não tem relação direta com a redução de ocorrências de atraso nas rotas operacionais da VeloLog.' },
+      { letra: 'D', texto: 'Reduzir o BI a um repositório de histórico para auditorias é um desperdício grave de capacidade analítica e mantém a empresa no nível mais básico de maturidade de dados.' },
+      { letra: 'E', texto: 'Bloqueio automático sem análise contextual pode eliminar transportadores com avaliação temporariamente baixa por razões externas (ex: greve, desastre natural), gerando ruptura operacional e violando os princípios de liderança responsável do framework CHAF.' }
+    ]
+  },
+
+  // ─── Q6: SUBJETIVA — CASO REDE DE CLÍNICAS ──────────────────────────────
+  {
+    id: 6,
+    tipo: 'subjetiva',
+    tema: 'Cultura Data-Driven e KPIs (Caso ClinicaVida)',
+    contexto: '<strong>Contexto Gerencial:</strong> A rede de clínicas médicas <strong>ClinicaVida</strong> opera 18 unidades em cinco estados. Seus relatórios de desempenho são gerados manualmente em Excel pelo setor financeiro, com entrega quinzenal à diretoria. O CEO decidiu implantar um dashboard de BI em Power BI para descentralizar as análises e permitir que os coordenadores de cada unidade acompanhem seus indicadores em tempo real. Contudo, os coordenadores resistem à mudança, alegando que "os dados do sistema não refletem a realidade clínica" e que "o Excel que usamos é mais confiável". Além disso, o CFO identificou que a taxa de ocupação de agendas caiu de 87% para 71% nos últimos seis meses, mas ninguém sabe exatamente qual a causa.',
+    enunciado: 'Na posição de Diretor de BI e Governança de Dados da ClinicaVida, elabore um parecer executivo estruturado respondendo aos seguintes pontos:<br><br><strong>1. Gestão de Mudança (Cultura Data-Driven):</strong> Apresente duas ações práticas para superar a resistência dos coordenadores e promover a adoção do Power BI, justificando sua escolha com base no Framework CHAF (Conhecimento, Habilidade, Atitude e Foco no Resultado).<br><br><strong>2. Indicadores de Impacto:</strong> Defina um KPI de Ocupação de Agenda e um KPI de Eficiência Clínica que devem constar no dashboard principal. Para cada indicador, apresente: a <strong>fórmula matemática</strong>, um <strong>exemplo prático de cálculo</strong> com números hipotéticos e a <strong>interpretação gerencial do resultado</strong> (o que o número diz ao gestor para orientar sua decisão).',
+    gabaritoSubjetiva: `<h4>Espelho de Correção Oficial — Para Autoavaliação</h4>
+<p>Compare sua argumentação com as diretrizes abaixo. A resposta deve ter a estrutura e o rigor de um parecer executivo real, não de um resumo teórico.</p>
+
+<div style="margin-top:16px; padding:18px; background:#f8fafc; border-left:4px solid var(--azul-primario); border-radius:4px;">
+  <p><strong>1. Gestão de Mudança — Framework CHAF:</strong></p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Ação 1 — Co-criação dos Dashboards (Atitude + Habilidade):</strong> Realizar workshops com os coordenadores de cada unidade para que eles participem ativamente do desenho das telas do Power BI (fase de wireframe). Quando o gestor ajuda a construir o painel, ele passa a sentir propriedade sobre o dado e para de enxergar o BI como uma imposição da TI. Essa ação desenvolve a Habilidade técnica de uso da ferramenta e muda a Atitude de resistência para protagonismo.</p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Ação 2 — Desativação Planejada do Excel Paralelo (Foco no Resultado):</strong> Após o treinamento e a validação das fontes oficiais de dados, estabelecer uma data-limite para a descontinuação dos relatórios em Excel quinzenais. O processo deve ser gradual (90 dias) e acompanhado de suporte técnico. Sem a desativação planejada, o Excel paralelo continuará sendo a "fonte da verdade" para os coordenadores, inviabilizando a governança de dados.</p>
+
+  <p style="margin-top:16px;"><strong>2. KPIs de Negócio — Fórmulas e Interpretação:</strong></p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>KPI 1 — Taxa de Ocupação de Agenda:</strong><br>
+  Fórmula: <em>Taxa de Ocupação = (Consultas Realizadas / Slots de Agenda Disponíveis) × 100</em><br>
+  Exemplo: Uma unidade tem 200 slots disponíveis por semana e realizou 142 consultas. Taxa = (142 / 200) × 100 = 71%.<br>
+  Interpretação Gerencial: 29% da capacidade instalada está ociosa. O gestor deve cruzar esse dado com o indicador de cancelamentos de última hora e de não comparecimento (no-show) para identificar se o problema é de demanda (poucos agendamentos) ou de eficiência operacional (muitos cancelamentos sem reposição). Cada ponto percentual de ocupação recuperado representa receita direta para a unidade.</p>
+
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>KPI 2 — Taxa de Retorno de Pacientes (Fidelização Clínica):</strong><br>
+  Fórmula: <em>Taxa de Retorno = (Pacientes que retornaram no período / Total de Pacientes Atendidos no período anterior) × 100</em><br>
+  Exemplo: No trimestre anterior, 1.200 pacientes foram atendidos. No trimestre atual, 780 desses mesmos pacientes retornaram. Taxa de Retorno = (780 / 1.200) × 100 = 65%.<br>
+  Interpretação Gerencial: 35% dos pacientes não retornaram para uma segunda consulta. O gestor deve cruzar esse dado com a especialidade médica e com a nota de satisfação pós-consulta (NPS) para identificar se o problema é de qualidade do atendimento, de preço ou de falta de comunicação ativa de retorno (régua de relacionamento).</p>
+</div>`
+  },
+
+  // ─── Q7: SUBJETIVA — CASO REDE DE MATERIAIS DE CONSTRUÇÃO ───────────────
+  {
+    id: 7,
+    tipo: 'subjetiva',
+    tema: 'Análise de Cenário Gerencial (Hierarquia DIKW e Decisão Prescritiva)',
+    contexto: '<strong>Contexto Gerencial:</strong> O analista de BI da rede de materiais de construção <strong>ConstruFácil</strong> (12 lojas) gerou o painel abaixo, que apresenta o desempenho de vendas do último trimestre por categoria de produto. O Diretor Comercial observou que a categoria <em>Cimento e Argamassa</em> representa 38% do faturamento total, mas sua margem de contribuição caiu de 22% para 9% no período. Ao mesmo tempo, a categoria <em>Ferramentas Elétricas</em> cresceu 31% em volume, mas representa apenas 8% do faturamento.',
+    visual: `<div class="grafico-ascii">  Dashboard ConstruFácil — Desempenho por Categoria (Último Trimestre)
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  CATEGORIA            FATURAMENTO (%)  MARGEM (%)  CRESCIMENTO VOL  │
+  │  ─────────────────────────────────────────────────────────────────  │
+  │  Cimento e Argamassa      38%          ▼  9%        + 2%            │
+  │  Tintas e Revestimentos   24%             18%       + 5%            │
+  │  Ferramentas Elétricas     8%             31%       ▲ +31%          │
+  │  Hidráulica e Elétrica    16%             24%       + 8%            │
+  │  Outros                   14%             15%       + 1%            │
+  └─────────────────────────────────────────────────────────────────────┘
+  Nota: ▼ indica queda crítica de margem · ▲ indica crescimento expressivo</div>`,
+    enunciado: 'Analise criticamente o cenário apresentado no dashboard da ConstruFácil e responda:<br><br><strong>1. Diagnóstico Analítico (Hierarquia DIKW):</strong> Aplique a Hierarquia DIKW ao cenário acima. Identifique qual é o <em>dado</em>, qual é a <em>informação</em>, qual é o <em>conhecimento</em> gerado pela análise e qual seria a <em>sabedoria</em> (decisão de negócio) esperada do Diretor Comercial diante dos números apresentados.<br><br><strong>2. Decisão Prescritiva:</strong> Com base no diagnóstico, formule duas recomendações prescritivas concretas para o Diretor Comercial, visando recuperar a margem da categoria de Cimento e Argamassa e capitalizar o crescimento de Ferramentas Elétricas.',
+    gabaritoSubjetiva: `<h4>Espelho de Correção Oficial — Para Autoavaliação</h4>
+<p>Sua resposta deve demonstrar domínio da Hierarquia DIKW aplicada a um cenário real de negócios, indo além da definição teórica dos conceitos.</p>
+
+<div style="margin-top:16px; padding:18px; background:#f8fafc; border-left:4px solid var(--azul-primario); border-radius:4px;">
+  <p><strong>1. Aplicação da Hierarquia DIKW ao Caso ConstruFácil:</strong></p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Dado (Data):</strong> Cimento e Argamassa representa 38% do faturamento e a margem caiu de 22% para 9%. Ferramentas Elétricas cresceu 31% em volume com margem de 31%.</p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Informação (Information):</strong> A categoria mais representativa em faturamento está destruindo margem (queda de 13 pontos percentuais), enquanto a categoria de menor faturamento apresenta a maior margem e o maior crescimento de volume do portfólio.</p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Conhecimento (Knowledge):</strong> A ConstruFácil está concentrando seu faturamento em uma categoria de baixa margem (possivelmente por pressão de preço de concorrentes ou por política de desconto agressiva para girar estoque de cimento), enquanto subutiliza uma categoria de alta margem e alto crescimento. Isso indica um desalinhamento entre o mix de vendas praticado e a estratégia de rentabilidade da rede.</p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Sabedoria (Wisdom):</strong> O Diretor Comercial deve agir: revisar a política de preços e descontos de Cimento e Argamassa para recuperar a margem, e redirecionar esforços comerciais (treinamento de vendedores, exposição no PDV, campanhas) para ampliar o mix de Ferramentas Elétricas, que combina crescimento de demanda com alta rentabilidade.</p>
+
+  <p style="margin-top:16px;"><strong>2. Recomendações Prescritivas:</strong></p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Recomendação 1 — Revisão da Política de Preços de Cimento (Recuperação de Margem):</strong> Realizar uma análise de elasticidade de preço da categoria de Cimento e Argamassa por loja, identificando quais unidades estão praticando descontos acima do limite de margem mínima aceitável (ex: 15%). Implementar no sistema uma trava de precificação que impeça a concessão de descontos que levem a margem abaixo de 15%, com alerta automático para o gerente da loja no Power BI.</p>
+  <p style="margin-left:16px; font-size:0.93rem; margin-top:8px;"><strong>Recomendação 2 — Estratégia de Ampliação do Mix de Ferramentas Elétricas (Capitalização do Crescimento):</strong> Criar uma campanha de cross-selling no PDV associando a compra de cimento e argamassa à oferta de ferramentas elétricas (ex: "Compre R$ 500 em cimento e ganhe 20% de desconto em furadeiras"). Isso eleva o ticket médio da categoria de maior faturamento, dilui o custo de aquisição do cliente e aumenta a participação de Ferramentas Elétricas no mix de vendas, melhorando a margem consolidada da rede.</p>
+</div>`
+  }
+
+]; // fim do array questoes
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════════════════════════
+let indexAtual = 0;
+let respostasUsuario = [];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CONTROLE DE TELAS
+// ═══════════════════════════════════════════════════════════════════════════
+function iniciarSimulado() {
+  document.getElementById('tela-inicio').style.display = 'none';
+  document.getElementById('tela-questao').style.display = 'block';
+  indexAtual = 0;
+  respostasUsuario = [];
+  carregarQuestao(0);
+}
+
+function carregarQuestao(idx) {
+  const q = questoes[idx];
+  const total = questoes.length;
+
+  // Progresso
+  document.getElementById('progressBar').style.width = ((idx / total) * 100) + '%';
+  document.getElementById('progressLabel').textContent = `${idx} / ${total}`;
+  document.getElementById('questaoNum').textContent = `Questão ${idx + 1} de ${total}`;
+  document.getElementById('questaoTema').textContent = q.tema;
+
+  // Contexto
+  const ctxDiv = document.getElementById('questaoContexto');
+  if (q.contexto) { ctxDiv.innerHTML = q.contexto; ctxDiv.style.display = 'block'; }
+  else { ctxDiv.style.display = 'none'; }
+
+  // Visual (fluxograma, tabela, gráfico)
+  const visDiv = document.getElementById('questaoVisual');
+  visDiv.innerHTML = q.visual || '';
+
+  // Enunciado
+  document.getElementById('questaoEnunciado').innerHTML = q.enunciado;
+
+  // Resetar gabarito e nav
+  document.getElementById('gabaritoBox').style.display = 'none';
+  document.getElementById('navQuestao').style.display = 'none';
+  document.getElementById('porQueErradas').style.display = 'none';
+
+  const altDiv = document.getElementById('alternativas');
+  const subjBox = document.getElementById('subjetivaInputBox');
+
+  if (q.tipo === 'objetiva') {
+    altDiv.style.display = 'flex';
+    subjBox.style.display = 'none';
+    renderAlternativas(q);
+  } else {
+    altDiv.style.display = 'none';
+    subjBox.style.display = 'block';
+    const ta = document.getElementById('subjetivaResposta');
+    ta.value = '';
+    ta.disabled = false;
+    document.getElementById('btnEnviarSubjetiva').disabled = false;
+  }
+
+  // Scroll suave ao topo da questão
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderAlternativas(q) {
+  const div = document.getElementById('alternativas');
+  div.innerHTML = '';
+  const letras = ['A','B','C','D','E'];
+  q.alternativas.forEach((txt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'alt-btn';
+    btn.onclick = () => selecionarAlternativa(i);
+    btn.innerHTML = `<span class="alt-letra">${letras[i]}</span><span>${txt}</span>`;
+    div.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INTERAÇÃO — OBJETIVAS
+// ═══════════════════════════════════════════════════════════════════════════
+function selecionarAlternativa(opcao) {
+  const q = questoes[indexAtual];
+  const botoes = document.querySelectorAll('.alt-btn');
+  botoes.forEach(b => b.disabled = true);
+
+  const acertou = (opcao === q.correta);
+  respostasUsuario.push({ questaoId: q.id, tipo: 'objetiva', tema: q.tema, acertou });
+
+  botoes.forEach((b, i) => {
+    if (i === q.correta) b.classList.add('correta');
+    else if (i === opcao) b.classList.add('errada');
+    else b.classList.add('neutra-pos');
+  });
+
+  // Gabarito
+  const box = document.getElementById('gabaritoBox');
+  const hdr = document.getElementById('gabaritoHeader');
+  const icone = document.getElementById('gabaritoIcone');
+  const titulo = document.getElementById('gabaritoTitulo');
+  const subtitulo = document.getElementById('gabaritoSubtitulo');
+  const expl = document.getElementById('gabaritoExplicacao');
+  const erradas = document.getElementById('porQueErradas');
+
+  box.style.display = 'block';
+  subtitulo.textContent = 'Por que esta é a resposta correta?';
+  expl.innerHTML = q.explicacao;
+
+  if (acertou) {
+    hdr.className = 'gabarito-header acerto';
+    icone.textContent = '✓';
+    titulo.textContent = 'Resposta Correta! Raciocínio analítico preciso.';
+  } else {
+    hdr.className = 'gabarito-header erro';
+    icone.textContent = '✗';
+    titulo.textContent = `Resposta Incorreta. A alternativa correta era a ${'ABCDE'[q.correta]}.`;
+  }
+
+  let html = '<h4>Análise das Alternativas:</h4><ul>';
+  q.porQueErradas.forEach(item => {
+    const cls = item.correta ? ' class="correta-item"' : '';
+    html += `<li${cls}><strong>Alternativa ${item.letra}:</strong> ${item.texto}</li>`;
+  });
+  html += '</ul>';
+  erradas.innerHTML = html;
+  erradas.style.display = 'block';
+
+  document.getElementById('navQuestao').style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INTERAÇÃO — SUBJETIVAS
+// ═══════════════════════════════════════════════════════════════════════════
+function enviarSubjetiva() {
+  const resp = document.getElementById('subjetivaResposta').value.trim();
+  if (resp.length < 30) {
+    alert('Elabore uma resposta mais completa. O simulado exige que você argumente como um administrador orientado a dados.');
+    return;
+  }
+  const q = questoes[indexAtual];
+  document.getElementById('subjetivaResposta').disabled = true;
+  document.getElementById('btnEnviarSubjetiva').disabled = true;
+  respostasUsuario.push({ questaoId: q.id, tipo: 'subjetiva', tema: q.tema });
+
+  const box = document.getElementById('gabaritoBox');
+  const hdr = document.getElementById('gabaritoHeader');
+  const icone = document.getElementById('gabaritoIcone');
+  const titulo = document.getElementById('gabaritoTitulo');
+  const subtitulo = document.getElementById('gabaritoSubtitulo');
+  const expl = document.getElementById('gabaritoExplicacao');
+  const erradas = document.getElementById('porQueErradas');
+
+  box.style.display = 'block';
+  hdr.className = 'gabarito-header subjetiva-info';
+  icone.textContent = 'ℹ';
+  titulo.textContent = 'Resposta registrada. Compare sua análise com o espelho oficial.';
+  subtitulo.textContent = '';
+  expl.innerHTML = q.gabaritoSubjetiva;
+  erradas.style.display = 'none';
+
+  document.getElementById('navQuestao').style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NAVEGAÇÃO E DIAGNÓSTICO
+// ═══════════════════════════════════════════════════════════════════════════
+function proximaQuestao() {
+  document.getElementById('subjetivaResposta').disabled = false;
+  indexAtual++;
+  if (indexAtual < questoes.length) {
+    carregarQuestao(indexAtual);
+  } else {
+    finalizarSimulado();
+  }
+}
+
+function finalizarSimulado() {
+  document.getElementById('tela-questao').style.display = 'none';
+  document.getElementById('tela-diagnostico').style.display = 'block';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressLabel').textContent = '7 / 7';
+
+  const obj = respostasUsuario.filter(r => r.tipo === 'objetiva');
+  const acertos = obj.filter(r => r.acertou).length;
+  const erros = obj.length - acertos;
+  const perc = (acertos / obj.length) * 100;
+  const notaObj = acertos * 1.2;
+  const notaFinal = Math.min(10, (notaObj + 4.0)).toFixed(1);
+
+  document.getElementById('diagAcertos').textContent = acertos;
+  document.getElementById('diagErros').textContent = erros;
+  document.getElementById('diagNota').textContent = `${notaFinal} / 10`;
+  document.getElementById('diagPerc').textContent = `${perc.toFixed(0)}%`;
+
+  // Mapeamento tema → apostila
+  const temas = {
+    'Modelagem Dimensional (Star Schema)': {
+      acertos: 0, total: 0,
+      apostila: 'Apostila_BI_Relacionamentos_Tabelas.pdf',
+      aula: 'Criando Relacionamento entre Tabelas para Relatórios Integrados'
+    },
+    'Cálculos Avançados em DAX': {
+      acertos: 0, total: 0,
+      apostila: 'Apostila_BI_DAX_Performance.pdf',
+      aula: 'DAX: Criando Métricas de Performance'
+    },
+    'Storytelling e Atributos Pré-Atentativos': {
+      acertos: 0, total: 0,
+      apostila: 'Apostila_Storytelling_KPIs_Final.pdf · Aula11.03-Design e Visualização de Dados',
+      aula: 'Design Estratégico de Dados: Storytelling e KPIs'
+    },
+    'ETL e Qualidade de Dados': {
+      acertos: 0, total: 0,
+      apostila: 'AULA03_ColetaeQualidadedosdados.pdf',
+      aula: 'Coleta e Qualidade dos Dados'
+    },
+    'KPIs, CHAF e Análise Prescritiva': {
+      acertos: 0, total: 0,
+      apostila: 'Apostila_BI_Benchmarking.pdf · Apostila_Storytelling_KPIs_Final.pdf',
+      aula: 'Benchmarking e Design Estratégico de Indicadores'
+    }
+  };
+
+  obj.forEach(r => {
+    if (temas[r.tema]) {
+      temas[r.tema].total++;
+      if (r.acertou) temas[r.tema].acertos++;
+    }
+  });
+
+  // Barras de desempenho
+  const barrasDiv = document.getElementById('barrasTemas');
+  barrasDiv.innerHTML = '';
+  for (const [tema, info] of Object.entries(temas)) {
+    const pct = info.total > 0 ? (info.acertos / info.total) * 100 : 100;
+    const cor = pct < 50 ? '#dc3545' : pct < 100 ? '#ff8c00' : '#28a745';
+    barrasDiv.innerHTML += `
+      <div class="barra-tema">
+        <span class="barra-tema-nome">${tema}</span>
+        <div class="barra-bg"><div class="barra-fill" style="width:${pct}%;background:${cor};"></div></div>
+        <span class="barra-pct" style="color:${cor};">${pct.toFixed(0)}%</span>
+      </div>`;
+  }
+
+  // Análise e Recomendações
+  const analiseDiv = document.getElementById('analiseDetalhada');
+  const recDiv = document.getElementById('recomendacoes');
+  analiseDiv.innerHTML = '';
+  recDiv.innerHTML = '';
+  let temGargalo = false;
+
+  for (const [tema, info] of Object.entries(temas)) {
+    const pct = info.total > 0 ? (info.acertos / info.total) * 100 : 100;
+    if (pct < 100) {
+      temGargalo = true;
+      analiseDiv.innerHTML += `
+        <div class="diag-item gargalo">
+          <span class="diag-icone">⚠️</span>
+          <div class="diag-texto"><strong>Gargalo em ${tema}:</strong> A questão sobre este tópico não foi respondida corretamente. A lógica de aplicação gerencial deste conteúdo precisa ser reforçada para evitar perda de pontos na prova.</div>
+        </div>`;
+      recDiv.innerHTML += `
+        <div class="rec-card">
+          <h4>Revisão Necessária: ${tema}</h4>
+          <p>Retome a apostila técnica e os exercícios práticos relacionados a este tópico. Foque na lógica de decisão gerencial, não apenas na definição dos conceitos.</p>
+          <span class="aulas-tag">${info.apostila}</span>
+          <span class="aulas-tag">${info.aula}</span>
+        </div>`;
+    } else {
+      analiseDiv.innerHTML += `
+        <div class="diag-item acerto">
+          <span class="diag-icone">✅</span>
+          <div class="diag-texto"><strong>Domínio em ${tema}:</strong> Você aplicou corretamente a lógica analítica deste conteúdo ao cenário de negócios proposto. Mantenha esse nível de rigor na prova.</div>
+        </div>`;
+    }
+  }
+
+  if (!temGargalo) {
+    recDiv.innerHTML = `
+      <div class="rec-card" style="border-color:var(--verde-borda);background:var(--verde-claro);">
+        <h4 style="color:var(--verde);">Gabarito Perfeito nas Objetivas</h4>
+        <p>Não há gargalos críticos de conteúdo nas questões objetivas. Para a prova, revise os espelhos de correção das questões subjetivas e garanta que sua escrita esteja alinhada ao rigor analítico esperado de um administrador orientado a dados.</p>
+      </div>`;
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function refazerSimulado() {
+  if (confirm('Deseja reiniciar o simulado? Suas respostas serão apagadas.')) iniciarSimulado();
+}
+
+function voltarInicio() {
+  document.getElementById('tela-diagnostico').style.display = 'none';
+  document.getElementById('tela-inicio').style.display = 'block';
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('progressLabel').textContent = '0 / 7';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
