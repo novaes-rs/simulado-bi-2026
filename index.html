@@ -863,80 +863,83 @@ const BANCO_OBJETIVAS = [
 
 ,
 
-  // ─── Q9: PADRÃO DE LEITURA EM Z vs F-LAYOUT ────────────────────────────────
+  // ─── Q9: PADRÃO DE LEITURA EM Z ──────────────────────────────────────────────────────────
   {
     id: 9,
     tipo: 'objetiva',
-    tema: 'Padrões de Leitura Visual (Z e F) e Design de Dashboard',
-    contexto: '<strong>Contexto Gerencial:</strong> A rede de hotelaria <strong>CoastalInn</strong> (12 hotéis) está desenvolvendo dois dashboards distintos no Power BI: (1) um <strong>painel executivo</strong> para o CEO, exibido em uma tela de 65 polegadas na sala de reuniões da diretoria, com quatro KPIs estratégicos (Receita Total, RevPAR, Taxa de Ocupação e NPS), visualizado rapidamente em reuniões de 10 minutos; e (2) um <strong>painel operacional</strong> para os gerentes de cada hotel, acessado no computador, com múltiplas linhas de indicadores de check-in, housekeeping, manutenção e restaurante que precisam ser analisados em profundidade. O analista de BI está em dúvida sobre qual padrão de leitura visual aplicar em cada painel.',
+    tema: 'Padrão de Leitura em Z e Design de Dashboard Executivo',
+    contexto: '<strong>Contexto Gerencial:</strong> O CEO da rede de hotelaria <strong>CoastalInn</strong> (12 hotéis) utiliza um painel executivo no Power BI exibido em uma tela de 65 polegadas na sala de reuniões da diretoria. O painel deve comunicar quatro KPIs estratégicos — Receita Total, RevPAR, Taxa de Ocupação e NPS — em reuniões de no máximo 10 minutos. O analista de BI atual posicionou os quatro KPIs em uma coluna vertical no lado direito da tela, com um gráfico de barras de 20 séries ocupando o centro. O CEO reclama que precisa de mais de 5 minutos apenas para localizar o NPS e a Receita Total antes de começar a discussão.',
     visual: `<div class="svg-container">
 <svg viewBox="0 0 580 230" xmlns="http://www.w3.org/2000/svg" style="max-width:580px;">
-  <!-- Painel Z -->
-  <rect x="10" y="10" width="260" height="210" rx="8" fill="#0d233a" stroke="#f39c12" stroke-width="2"/>
-  <text x="140" y="30" text-anchor="middle" fill="#f39c12" font-size="11" font-weight="bold">Padrão Z — Painel Executivo</text>
-  <!-- KPI 1 topo esq -->
-  <rect x="20" y="40" width="100" height="50" rx="6" fill="#1c4263"/>
-  <text x="70" y="62" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Receita Total</text>
-  <text x="70" y="78" text-anchor="middle" fill="#f39c12" font-size="12" font-weight="bold">R$4,2M</text>
-  <!-- KPI 2 topo dir -->
-  <rect x="150" y="40" width="100" height="50" rx="6" fill="#1c4263"/>
-  <text x="200" y="62" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">RevPAR</text>
-  <text x="200" y="78" text-anchor="middle" fill="#f39c12" font-size="12" font-weight="bold">R$312</text>
-  <!-- Seta Z horizontal topo -->
-  <path d="M 120 65 L 150 65" stroke="#f39c12" stroke-width="2" fill="none" marker-end="url(#arrowZ)"/>
-  <!-- Seta Z diagonal -->
-  <path d="M 150 90 L 120 130" stroke="#f39c12" stroke-width="2" fill="none" stroke-dasharray="4,2"/>
-  <!-- KPI 3 baixo esq -->
-  <rect x="20" y="130" width="100" height="50" rx="6" fill="#1c4263"/>
-  <text x="70" y="152" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Ocupação</text>
-  <text x="70" y="168" text-anchor="middle" fill="#2ecc71" font-size="12" font-weight="bold">87%</text>
-  <!-- KPI 4 baixo dir -->
-  <rect x="150" y="130" width="100" height="50" rx="6" fill="#1c4263"/>
-  <text x="200" y="152" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">NPS</text>
-  <text x="200" y="168" text-anchor="middle" fill="#2ecc71" font-size="12" font-weight="bold">+72</text>
-  <!-- Seta Z horizontal baixo -->
-  <path d="M 120 155 L 150 155" stroke="#f39c12" stroke-width="2" fill="none"/>
-  <text x="140" y="205" text-anchor="middle" fill="#f39c12" font-size="9">Leitura: → ↘ → (Z)</text>
-  <!-- Painel F -->
-  <rect x="310" y="10" width="260" height="210" rx="8" fill="#0d233a" stroke="#3498db" stroke-width="2"/>
-  <text x="440" y="30" text-anchor="middle" fill="#3498db" font-size="11" font-weight="bold">Padrão F — Painel Operacional</text>
-  <!-- Linha 1 completa -->
-  <rect x="320" y="40" width="240" height="28" rx="4" fill="#1c4263"/>
-  <text x="440" y="58" text-anchor="middle" fill="#fff" font-size="9">Check-in · Ocupação · Receita (linha principal)</text>
-  <!-- Linha 2 parcial -->
-  <rect x="320" y="76" width="160" height="22" rx="4" fill="#1a3550"/>
-  <text x="400" y="91" text-anchor="middle" fill="#c9d1d9" font-size="9">Housekeeping · Manutenção</text>
-  <!-- Coluna esq -->
-  <rect x="320" y="106" width="60" height="18" rx="3" fill="#1a3550"/>
-  <text x="350" y="119" text-anchor="middle" fill="#c9d1d9" font-size="8">NPS</text>
-  <rect x="320" y="130" width="60" height="18" rx="3" fill="#1a3550"/>
-  <text x="350" y="143" text-anchor="middle" fill="#c9d1d9" font-size="8">RevPAR</text>
-  <rect x="320" y="154" width="60" height="18" rx="3" fill="#1a3550"/>
-  <text x="350" y="167" text-anchor="middle" fill="#c9d1d9" font-size="8">CMV</text>
-  <!-- Seta F -->
-  <path d="M 320 54 L 560 54" stroke="#3498db" stroke-width="2" fill="none"/>
-  <path d="M 320 87 L 480 87" stroke="#3498db" stroke-width="1.5" fill="none"/>
-  <path d="M 320 54 L 320 175" stroke="#3498db" stroke-width="1.5" fill="none"/>
-  <text x="440" y="205" text-anchor="middle" fill="#3498db" font-size="9">Leitura: → / → / ↓ (F)</text>
-  <!-- Definicao de seta -->
-  <defs><marker id="arrowZ" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f39c12"/></marker></defs>
+  <defs>
+    <marker id="arrowZ2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#f39c12"/>
+    </marker>
+  </defs>
+  <!-- Layout ERRADO -->
+  <rect x="10" y="10" width="255" height="210" rx="8" fill="#fff5f5" stroke="#dc3545" stroke-width="2"/>
+  <text x="137" y="28" text-anchor="middle" fill="#9e2a2b" font-size="10" font-weight="bold">Layout Atual (Problema)</text>
+  <!-- Gráfico de barras enorme no centro -->
+  <rect x="20" y="35" width="155" height="175" rx="4" fill="#fceade" stroke="#dc3545" stroke-width="1"/>
+  <text x="97" y="120" text-anchor="middle" fill="#9e2a2b" font-size="9">Gráfico de Barras</text>
+  <text x="97" y="133" text-anchor="middle" fill="#9e2a2b" font-size="8">(20 séries · centro da tela)</text>
+  <!-- KPIs em coluna vertical direita -->
+  <rect x="183" y="35" width="72" height="38" rx="3" fill="#fceade" stroke="#dc3545" stroke-width="1"/>
+  <text x="219" y="52" text-anchor="middle" fill="#9e2a2b" font-size="8">Receita</text>
+  <text x="219" y="64" text-anchor="middle" fill="#9e2a2b" font-size="8">R$4,2M</text>
+  <rect x="183" y="80" width="72" height="38" rx="3" fill="#fceade" stroke="#dc3545" stroke-width="1"/>
+  <text x="219" y="97" text-anchor="middle" fill="#9e2a2b" font-size="8">RevPAR</text>
+  <text x="219" y="109" text-anchor="middle" fill="#9e2a2b" font-size="8">R$312</text>
+  <rect x="183" y="125" width="72" height="38" rx="3" fill="#fceade" stroke="#dc3545" stroke-width="1"/>
+  <text x="219" y="142" text-anchor="middle" fill="#9e2a2b" font-size="8">Ocupação</text>
+  <text x="219" y="154" text-anchor="middle" fill="#9e2a2b" font-size="8">87%</text>
+  <rect x="183" y="170" width="72" height="38" rx="3" fill="#fceade" stroke="#dc3545" stroke-width="1"/>
+  <text x="219" y="187" text-anchor="middle" fill="#9e2a2b" font-size="8">NPS</text>
+  <text x="219" y="199" text-anchor="middle" fill="#9e2a2b" font-size="8">+72</text>
+  <!-- Layout CORRETO com Padrão Z -->
+  <rect x="310" y="10" width="260" height="210" rx="8" fill="#e2f0d9" stroke="#28a745" stroke-width="2"/>
+  <text x="440" y="28" text-anchor="middle" fill="#1e7e34" font-size="10" font-weight="bold">Padrão Z (Correto)</text>
+  <!-- KPI 1: topo esquerdo -->
+  <rect x="320" y="35" width="110" height="55" rx="6" fill="#1c4263"/>
+  <text x="375" y="57" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Receita Total</text>
+  <text x="375" y="74" text-anchor="middle" fill="#f39c12" font-size="13" font-weight="bold">R$4,2M</text>
+  <!-- KPI 2: topo direito -->
+  <rect x="450" y="35" width="110" height="55" rx="6" fill="#1c4263"/>
+  <text x="505" y="57" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">RevPAR</text>
+  <text x="505" y="74" text-anchor="middle" fill="#f39c12" font-size="13" font-weight="bold">R$312</text>
+  <!-- Seta Z: horizontal topo → -->
+  <path d="M 430 62 L 450 62" stroke="#f39c12" stroke-width="2.5" fill="none" marker-end="url(#arrowZ2)"/>
+  <!-- Seta Z: diagonal ↘ -->
+  <path d="M 450 90 L 375 130" stroke="#f39c12" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrowZ2)"/>
+  <!-- KPI 3: baixo esquerdo -->
+  <rect x="320" y="135" width="110" height="55" rx="6" fill="#1c4263"/>
+  <text x="375" y="157" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">Ocupação</text>
+  <text x="375" y="174" text-anchor="middle" fill="#2ecc71" font-size="13" font-weight="bold">87%</text>
+  <!-- KPI 4: baixo direito -->
+  <rect x="450" y="135" width="110" height="55" rx="6" fill="#1c4263"/>
+  <text x="505" y="157" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">NPS</text>
+  <text x="505" y="174" text-anchor="middle" fill="#2ecc71" font-size="13" font-weight="bold">+72</text>
+  <!-- Seta Z: horizontal baixo → -->
+  <path d="M 430 162 L 450 162" stroke="#f39c12" stroke-width="2.5" fill="none" marker-end="url(#arrowZ2)"/>
+  <!-- Label percurso Z -->
+  <text x="440" y="207" text-anchor="middle" fill="#1e7e34" font-size="9" font-weight="bold">Percurso: → ↘ → (Z) — todos os KPIs em &lt;3s</text>
 </svg></div>`,
-    enunciado: 'Com base nos padrões de leitura visual aplicados ao design de dashboards, qual é a estratégia correta de layout para os dois painéis da CoastalInn e qual é o fundamento cognitivo que justifica essa escolha?',
+    enunciado: 'Aplicando o padrão de leitura em Z ao redesign do painel executivo da CoastalInn, qual é a estrutura correta de disposição dos KPIs e qual é o fundamento cognitivo que justifica essa escolha para o contexto de tomada de decisão executiva?',
     alternativas: [
-      'O padrão Z deve ser aplicado no painel operacional dos gerentes, pois o movimento diagonal do Z permite cobrir mais áreas da tela e facilita a leitura de múltiplas linhas de indicadores. O padrão F deve ser aplicado no painel executivo do CEO, pois a leitura vertical do lado esquerdo é mais adequada para telas grandes de 65 polegadas.',
-      'O padrão Z é ideal para o painel executivo do CEO: com apenas 4 KPIs estratégicos dispostos nos quatro cantos da tela, o olho percorre o conteúdo em diagonal (topo esquerdo → topo direito → diagonal → baixo esquerdo → baixo direito), capturando toda a informação em segundos. O padrão F é ideal para o painel operacional dos gerentes: com múltiplas linhas de indicadores, o olho lê a primeira linha completa, depois linhas parciais e desce pelo lado esquerdo — refletindo o comportamento natural de leitura em conteúdo denso.',
-      'Ambos os painéis devem adotar o padrão F, pois é o único padrão validado por estudos de eye-tracking para ambientes corporativos. O padrão Z é exclusivo para páginas de e-commerce e não se aplica a dashboards de BI empresarial.',
-      'O padrão de leitura não influencia o design de dashboards no Power BI, pois a ferramenta possui algoritmos de renderização que adaptam automaticamente o layout ao dispositivo e ao perfil do usuário, tornando desnecessária a escolha manual do padrão visual.',
-      'O padrão Z deve ser aplicado em ambos os painéis, pois o movimento diagonal é universalmente mais eficiente para qualquer volume de informação. A diferença entre os painéis deve ser resolvida apenas ajustando o tamanho da fonte e a paleta de cores, sem alterar a estrutura de layout.'
+      'O padrão Z recomenda posicionar os quatro KPIs em uma coluna vertical centralizada na tela, pois o olho humano percorre o conteúdo de cima para baixo em linha reta antes de se mover horizontalmente. O gráfico de barras deve ser mantido no lado direito para equilibrar o peso visual do painel.',
+      'O padrão Z orienta posicionar os KPIs mais críticos nos quatro pontos de ancoragem da tela (topo esquerdo, topo direito, baixo esquerdo, baixo direito), pois o olho humano percorre naturalmente esse percurso em diagonal — horizontal no topo, diagonal descendente e horizontal na base. Essa estrutura garante que o CEO capture todos os indicadores estratégicos em menos de 3 segundos, sem esforço de busca visual.',
+      'O padrão Z é aplicado apenas em telas de smartphones e tablets, onde o espaço é reduzido. Para telas de 65 polegadas em sala de reuniões, o correto é usar o padrão de leitura radial, posicionando o KPI mais importante no centro geométrico da tela e os demais ao redor em círculo.',
+      'O padrão Z recomenda que o KPI de menor importância estratégica seja posicionado no topo esquerdo, pois é o primeiro ponto de atenção do olho. O KPI mais crítico deve ficar no centro da tela para que o CEO não o ignore durante a leitura diagonal.',
+      'O padrão Z é irrelevante para dashboards executivos porque o CEO não lê o painel — ele apenas ouve a apresentação do analista. O problema da CoastalInn é de treinamento do usuário, não de design do painel.'
     ],
     correta: 1,
-    explicacao: 'Os padrões de leitura visual são fundamentados em estudos de <strong>rastreamento ocular (eye-tracking)</strong>. O <strong>padrão Z</strong> ocorre quando há poucos elementos visuais bem espaçados: o olho percorre horizontalmente o topo, faz uma diagonal e percorre horizontalmente a base — ideal para painéis executivos com 4 a 6 KPIs estratégicos. O <strong>padrão F</strong> ocorre com conteúdo denso e múltiplas linhas: o olho lê a primeira linha completa, depois linhas cada vez mais curtas e desce pelo lado esquerdo — ideal para painéis operacionais com muitos indicadores. Aplicar o padrão errado significa que o gestor precisará de mais tempo e esforço cognitivo para encontrar a informação crítica.',
+    explicacao: 'O <strong>padrão de leitura em Z</strong> é fundamentado em estudos de <strong>rastreamento ocular (eye-tracking)</strong>: diante de um conteúdo com poucos elementos bem espaçados, o olho humano percorre naturalmente o percurso → ↘ → (horizontal no topo, diagonal descendente, horizontal na base). Para um painel executivo com 4 KPIs estratégicos, a disposição correta é <strong>um KPI em cada canto da tela</strong>: topo esquerdo (ponto de entrada do olho), topo direito, diagonal até o baixo esquerdo e baixo direito. Isso permite que o CEO capture todos os indicadores em menos de 3 segundos, sem esforço de busca. O erro do layout atual é colocar os KPIs em coluna vertical — o que força o olho a varrer toda a altura da tela para encontrar cada indicador.',
     porQueErradas: [
-      { letra: 'A', texto: 'Invertido. O padrão Z é para poucos elementos (painel executivo), não para múltiplas linhas de indicadores. O padrão F é para conteúdo denso (painel operacional), não para telas grandes.' },
-      { letra: 'B', texto: 'CORRETA — Z para painel executivo (poucos KPIs, leitura rápida em diagonal) e F para painel operacional (múltiplas linhas, leitura em profundidade). Cada padrão reflete o comportamento cognitivo natural para aquele tipo de conteúdo.', correta: true },
-      { letra: 'C', texto: 'O padrão Z é amplamente aplicado em dashboards executivos e apresentações corporativas. Não existe restrição de uso por setor ou tipo de ferramenta.' },
-      { letra: 'D', texto: 'O Power BI não adapta automaticamente o padrão de leitura. O design do layout é responsabilidade do analista de BI, que deve aplicar os princípios de design visual intencionalmente.' },
-      { letra: 'E', texto: 'Aplicar o padrão Z em conteúdo denso força o olho a ignorar informações no centro da tela. Fonte e cor não compensam um layout estruturalmente inadequado para o volume de informação.' }
+      { letra: 'A', texto: 'O padrão Z não é vertical. O percurso Z é horizontal-diagonal-horizontal, não uma coluna de cima para baixo. Uma coluna vertical é exatamente o layout problemático que o CEO está reclamando.' },
+      { letra: 'B', texto: 'CORRETA — Os quatro pontos de ancoragem do Z (topo esq → topo dir ↘ baixo esq → baixo dir) são os pontos de maior atenção visual. KPIs nesses pontos são capturados em segundos sem esforço cognitivo.', correta: true },
+      { letra: 'C', texto: 'O padrão Z é aplicado em qualquer tamanho de tela onde há poucos elementos visuais. Não existe padrão de leitura radial validado por estudos de eye-tracking para dashboards corporativos.' },
+      { letra: 'D', texto: 'Invertido. O topo esquerdo é o <em>primeiro</em> ponto de atenção do olho — deve receber o KPI <em>mais crítico</em>, não o menos importante. Posicionar o indicador principal no centro é um erro de design.' },
+      { letra: 'E', texto: 'O design do painel impacta diretamente a velocidade e a qualidade da decisão. Um painel mal estruturado gera perda de tempo e risco de decisões baseadas em informações incompletas — independentemente do nível hierárquico do usuário.' }
     ]
   },
 
@@ -1347,10 +1350,10 @@ function finalizarSimulado() {
       apostila: 'Apostila_BI_Wireframe_PowerBI_Final.pdf · Apostila_Storytelling_KPIs_Final.pdf',
       aula: 'Wireframes no Power BI · Design Estratégico de KPIs'
     },
-    'Padrões de Leitura Visual (Z e F) e Design de Dashboard': {
+    'Padrão de Leitura em Z e Design de Dashboard Executivo': {
       acertos: 0, total: 0,
       apostila: 'Apostila_BI_Wireframe_PowerBI_Final.pdf · AILA_18.03_DesignEstrategico.pdf',
-      aula: 'Design e Visualização de Dados para Gestores · Padrões de Leitura Visual'
+      aula: 'Design e Visualização de Dados para Gestores · Padrão de Leitura em Z'
     },
     'Tipos de Dashboard (Estratégico, Tático e Operacional)': {
       acertos: 0, total: 0,
