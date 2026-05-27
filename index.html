@@ -60,6 +60,73 @@
 
   main { max-width: 880px; margin: 40px auto 80px; padding: 0 20px; }
 
+  /* TELA SENHA */
+  #tela-senha {
+    background: var(--branco);
+    border-radius: 14px;
+    border: 1px solid var(--cinza-borda);
+    padding: 60px 44px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(13,35,58,0.07);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  #tela-senha .lock-icon {
+    font-size: 3rem;
+    margin-bottom: 18px;
+    display: block;
+  }
+  #tela-senha h2 {
+    font-size: 1.6rem;
+    color: var(--azul-primario);
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  #tela-senha p {
+    color: var(--texto-sec);
+    font-size: 0.97rem;
+    margin-bottom: 28px;
+    line-height: 1.65;
+  }
+  #tela-senha .senha-input-wrap {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  #tela-senha input[type=password] {
+    flex: 1;
+    max-width: 280px;
+    padding: 12px 16px;
+    border: 2px solid var(--cinza-borda);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--texto);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #tela-senha input[type=password]:focus {
+    border-color: var(--azul-borda);
+  }
+  #tela-senha input[type=password].erro {
+    border-color: var(--vermelho-borda);
+    animation: shake 0.35s ease;
+  }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-5px)}
+    80%{transform:translateX(5px)}
+  }
+  #msg-senha-erro {
+    color: var(--vermelho);
+    font-size: 0.9rem;
+    min-height: 20px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
   /* TELA INÍCIO */
   #tela-inicio {
     background: var(--branco);
@@ -381,8 +448,20 @@
 
 <main>
 
+  <!-- ═══════════════════════════════════════════════════════ TELA SENHA -->
+  <div id="tela-senha">
+    <span class="lock-icon">🔒</span>
+    <h2>Acesso Restrito</h2>
+    <p>Este simulado é de uso exclusivo dos alunos matriculados na disciplina de Business Intelligence.<br>Digite a senha fornecida pela professora para continuar.</p>
+    <div class="senha-input-wrap">
+      <input type="password" id="inputSenha" placeholder="Digite a senha de acesso" onkeydown="if(event.key==='Enter') verificarSenha()">
+    </div>
+    <div id="msg-senha-erro"></div>
+    <button class="btn-primario" onclick="verificarSenha()">Acessar Simulado</button>
+  </div>
+
   <!-- ═══════════════════════════════════════════════════════ TELA INÍCIO -->
-  <div id="tela-inicio">
+  <div id="tela-inicio" style="display:none;">
     <div class="badge">Business Intelligence · Administração</div>
     <h2>Simulado de Revisão — Prova Integrada</h2>
     <p>Questões contextualizadas em cenários reais de tomada de decisão gerencial. Cada resposta apresenta gabarito comentado com análise de todas as alternativas.</p>
@@ -419,7 +498,7 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════════ TELA QUESTÃO -->
-  <div id="tela-questao">
+  <div id="tela-questao" style="display:none;">
     <div id="aluno-bar" class="aluno-info-bar" style="display:none;">
       <span>Aluno(a):</span> <strong id="alunoNomeBar"></strong>
     </div>
@@ -1093,6 +1172,25 @@ function montarQuestoes() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SENHA DE ACESSO
+const SENHA_CORRETA = 'rd280122';
+function verificarSenha() {
+  const inp = document.getElementById('inputSenha');
+  const msg = document.getElementById('msg-senha-erro');
+  if (inp.value === SENHA_CORRETA) {
+    document.getElementById('tela-senha').style.display = 'none';
+    document.getElementById('tela-inicio').style.display = 'block';
+    msg.textContent = '';
+  } else {
+    inp.classList.remove('erro');
+    void inp.offsetWidth; // reflow para reiniciar animação
+    inp.classList.add('erro');
+    msg.textContent = 'Senha incorreta. Verifique com a professora.';
+    inp.value = '';
+    inp.focus();
+  }
+}
+
 // CONTROLE DE TELAS
 // ═══════════════════════════════════════════════════════════════════════════
 function iniciarSimulado() {
